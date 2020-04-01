@@ -20,6 +20,7 @@ interface SignaturePanelProps {
 	strokeColor?: string;
 	strokeWidth?: number;
 	onFingerUp?: (...args: any[]) => any;
+	onFingerUpTimeout?: number;
 	onTouch?: (...args: any[]) => any;
 	onTouchEnd?: (...args: any[]) => any;
 	imageOutputSize?: number;
@@ -44,6 +45,7 @@ class SignaturePanel extends React.Component<SignaturePanelProps, SignaturePanel
 		offsetX: 0,
 		offsetY: 0,
 		onFingerUp: () => {},
+		onFingerUpTimeout: 1000,
 		onTouch: () => {},
 		onTouchEnd: () => {},
 		outputType: 'tmpfile',
@@ -97,7 +99,7 @@ class SignaturePanel extends React.Component<SignaturePanelProps, SignaturePanel
 			paths: [],
 			points: [],
 			posX: 0,
-			posY: 0
+			posY: 0,
 		});
 	}
 
@@ -207,7 +209,7 @@ class SignaturePanel extends React.Component<SignaturePanelProps, SignaturePanel
 	 */
 
 	private returnImageData({ paths, points }: { paths: any[]; points: any[] }) {
-		const { onFingerUp, imageFormat, outputType, imageOutputSize, imageQuality } = this.props;
+		const { onFingerUp, onFingerUpTimeout, imageFormat, outputType, imageOutputSize, imageQuality } = this.props;
 		return () => {
 			if (!['jpg', 'png', 'webm', 'raw'].includes(imageFormat)) {
 				onFingerUp(this.renderSvg(paths, points));
@@ -224,7 +226,7 @@ class SignaturePanel extends React.Component<SignaturePanelProps, SignaturePanel
 					});
 					onFingerUp(file);
 					SignaturePanel.timer = null;
-				}, 1000);
+				}, onFingerUpTimeout);
 			}
 		};
 	}
